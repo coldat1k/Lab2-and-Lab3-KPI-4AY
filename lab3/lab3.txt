@@ -1,0 +1,43 @@
+@startuml
+skinparam sequenceParticipant underline
+skinparam BoxPadding 20
+skinparam ParticipantPadding 20
+skinparam shadowing true
+skinparam ArrowColor black
+skinparam SequenceLifeLineBorderColor #888
+skinparam SequenceLifeLineBackgroundColor #EEE
+skinparam SequenceGroupBorderColor #555
+skinparam SequenceGroupBackgroundColor #DDD
+skinparam SequenceGroupFontColor black
+
+actor User
+participant "StreamingDB System" as DB
+participant "PaymentService" as PS
+participant "PaymentSystem" as PaySys
+
+User -> DB : selectSubscription(plan)
+activate DB
+
+DB -> PS : processPayment(userId, plan)
+activate PS
+
+PS -> PaySys : initiatePayment(amount, cardData)
+activate PaySys
+
+PaySys --> PS : paymentResult(SUCCESS or FAILED)
+deactivate PaySys
+
+alt payment success
+    PS -> DB : updateSubscriptionStatus(userId, "active")
+    DB --> PS : OK
+    PS --> User : showSuccessMessage("Пiдписка активована")
+else payment failed
+    PS -> DB : updateSubscriptionStatus(userId, "failed")
+    DB --> PS : OK
+    PS --> User : showErrorMessage("Оплата не вдалася")
+end
+
+deactivate PS
+deactivate DB
+
+@enduml
