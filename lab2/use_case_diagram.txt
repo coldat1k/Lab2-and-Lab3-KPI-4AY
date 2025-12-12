@@ -1,0 +1,38 @@
+@startuml
+left to right direction
+skinparam actorStyle stickman
+
+actor User
+actor PaymentService <<external>>
+actor CinemaSystem <<external>>
+
+rectangle TicketBookingSystem {
+    usecase "UC1: Browse Movies & Sessions" as UC1
+    usecase "UC2: Select Seats" as UC2
+    usecase "UC3: Check Seat Availability" as UC3
+    usecase "UC4: Create Preliminary Booking" as UC4
+    usecase "UC5: Proceed to Payment" as UC5
+    usecase "UC6: Process Payment" as UC6
+    usecase "UC7: Confirm Booking in Cinema System" as UC7
+    usecase "UC8: Receive E-ticket" as UC8
+    usecase "UC9: Show Error: Seats Unavailable" as UC9
+    usecase "UC10: Show Payment Error" as UC10
+
+    UC2 --> UC3 : <<include>>
+    UC3 --> UC9 : <<extend>>
+    UC4 --> UC5 : <<include>>
+    UC5 --> UC6 : <<include>>
+    UC6 --> UC10 : <<extend>>
+    UC6 --> UC7 : <<include>>
+    UC7 --> UC8 : <<include>>
+}
+
+User --> UC1
+User --> UC2
+User --> UC5
+User --> UC8
+
+PaymentService --> UC6
+CinemaSystem --> UC7
+
+@enduml
